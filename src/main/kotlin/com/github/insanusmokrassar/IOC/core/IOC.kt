@@ -23,7 +23,7 @@ val configKey = "config"
  * </pre>
  */
 @Throws(IllegalArgumentException::class)
-fun init(config: IObject<Any>, targetIOC: IOC = IOC()) {
+fun loadConfig(config: IObject<Any>, into: IOC = IOC()) {
     val strategiesList = config.get<List<IObject<Any>>>(strategiesKey)
     strategiesList.forEach {
         val args: Array<Any>
@@ -36,7 +36,7 @@ fun init(config: IObject<Any>, targetIOC: IOC = IOC()) {
         } else {
             args = arrayOf()
         }
-        targetIOC.register(
+        into.register(
                 it.get(nameKey),
                 extract(
                         it.get(packageKey),
