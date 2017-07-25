@@ -23,7 +23,7 @@ val configKey = "config"
  * </pre>
  */
 @Throws(IllegalArgumentException::class)
-fun init(config: IObject<Any>, targetIOC: IOC) {
+fun init(config: IObject<Any>, targetIOC: IOC = IOC()) {
     val strategiesList = config.get<List<IObject<Any>>>(strategiesKey)
     strategiesList.forEach {
         val args: Array<Any>
@@ -61,9 +61,9 @@ class IOC {
     fun <T> resolve(key: String, vararg args: Any): T {
         try {
             try {
-                return strategies[key]!!.getInstance<T>(args)
+                return strategies[key]!!.getInstance<T>(*args)
             } catch (e: NullPointerException) {
-                return extract(key, args)
+                return extract(key, *args)
             }
         } catch (e: Throwable) {
             throw ResolveStrategyException("Can't resolve strategy for some of reason ($key, $args)", e)
