@@ -58,7 +58,7 @@ class IOC {
     }
 
     @Throws(ResolveStrategyException::class)
-    fun <T> resolve(key: String, vararg args: Any): T {
+    fun <T: Any> resolve(key: String, vararg args: Any): T {
         try {
             try {
                 return strategies[key]!!.getInstance<T>(*args)

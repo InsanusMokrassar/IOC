@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
 }
 
 object RandomOutputStreamStrategy: IOCStrategy {
-    override fun <T> getInstance(vararg args: Any): T {
+    override fun <T: Any> getInstance(vararg args: Any): T {
         val streams = ArrayList<OutputStream>()
         args.forEach {
             if (it is String) {
@@ -33,5 +33,4 @@ object RandomOutputStreamStrategy: IOCStrategy {
         }
         return streams[Random().nextInt(streams.size)] as T
     }
-
 }
