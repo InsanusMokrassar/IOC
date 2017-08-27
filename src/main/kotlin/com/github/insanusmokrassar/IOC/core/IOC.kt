@@ -9,10 +9,21 @@ val nameKey = "name"
 val packageKey = "package"
 val configKey = "config"
 
+private val iocMap = HashMap<String, IOC>()
+
+fun getOrCreateIOC(name: String): IOC {
+    synchronized(iocMap, {
+        if (!iocMap.containsKey(name)) {
+            iocMap.put(name, IOC())
+        }
+        return iocMap[name]!!
+    })
+}
+
 /**
  * <pre>
  *     {
- *          "strategies": [
+ *          "IOC NAME": [
  *              {
  *                  "name": "NameOfStrategy",
  *                  "package": "class.path.to.class.of.strategy",
@@ -23,37 +34,38 @@ val configKey = "config"
  * </pre>
  */
 @Throws(IllegalArgumentException::class)
-fun loadConfig(config: IObject<Any>, into: IOC = IOC()) {
-    val strategiesList = config.get<List<IObject<Any>>>(strategiesKey)
-    strategiesList.forEach {
-        val args = if (it.keys().contains(configKey)) {
-            try {
-                it.get<List<Any>>(configKey).toTypedArray()
-            } catch (e: ReadException) {
-                arrayOf(it.get<Any>(configKey))
+fun loadConfig(config: IObject<Any>) {
+    config.keys().forEach {
+        val ioc = getOrCreateIOC(it)
+        val strategiesList = config.get<List<IObject<Any>>>(it)
+        strategiesList.forEach {
+            val args = if (it.keys().contains(configKey)) {
+                try {
+                    it.get<List<Any>>(configKey).toTypedArray()
+                } catch (e: ReadException) {
+                    arrayOf(it.get<Any>(configKey))
+                }
+            } else {
+                arrayOf()
             }
-        } else {
-            arrayOf()
+            ioc.register(
+                    it.get(nameKey),
+                    extract(
+                            it.get(packageKey),
+                            *args
+                    )
+            )
         }
-        into.register(
-                it.get(nameKey),
-                extract(
-                        it.get(packageKey),
-                        *args
-                )
-        )
     }
 }
 
-class IOC {
+class IOC internal constructor(){
     private val strategies = HashMap<String, IOCStrategy>()
-    private val subscribers = ArrayList<(String) -> Unit>()
 
     fun register(key: String, strategy: IOCStrategy) {
         synchronized(strategies) {
             strategies.put(key, strategy)
         }
-        onChanged("Strategy for key \"$key\" with strategy \"$strategy\" registered.\n")
     }
 
     @Throws(ResolveStrategyException::class)
@@ -66,12 +78,6 @@ class IOC {
             }
         } catch (e: Throwable) {
             throw ResolveStrategyException("Can't resolve strategy for some of reason ($key, $args)", e)
-        }
-    }
-
-    private fun onChanged(what: String) {
-        subscribers.forEach {
-            it(what)
         }
     }
 }
