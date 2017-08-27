@@ -1,8 +1,8 @@
 package com.github.insanusmokrassar.IOC.core
 
 import com.github.insanusmokrassar.IOC.utils.extract
-import com.github.insanusmokrassar.iobjectk.exceptions.ReadException
-import com.github.insanusmokrassar.iobjectk.interfaces.IObject
+import com.github.insanusmokrassar.IObjectK.exceptions.ReadException
+import com.github.insanusmokrassar.IObjectK.interfaces.IObject
 
 val strategiesKey = "strategies"
 val nameKey = "name"
@@ -26,15 +26,14 @@ val configKey = "config"
 fun loadConfig(config: IObject<Any>, into: IOC = IOC()) {
     val strategiesList = config.get<List<IObject<Any>>>(strategiesKey)
     strategiesList.forEach {
-        val args: Array<Any>
-        if (it.keys().contains(configKey)) {
-            args = try {
+        val args = if (it.keys().contains(configKey)) {
+            try {
                 it.get<List<Any>>(configKey).toTypedArray()
             } catch (e: ReadException) {
                 arrayOf(it.get<Any>(configKey))
             }
         } else {
-            args = arrayOf()
+            arrayOf()
         }
         into.register(
                 it.get(nameKey),
@@ -59,11 +58,11 @@ class IOC {
 
     @Throws(ResolveStrategyException::class)
     fun <T: Any> resolve(key: String, vararg args: Any): T {
-        try {
+        return try {
             try {
-                return strategies[key]!!.getInstance<T>(*args)
+                strategies[key]!!.getInstance(*args)
             } catch (e: NullPointerException) {
-                return extract(key, *args)
+                extract(key, *args)
             }
         } catch (e: Throwable) {
             throw ResolveStrategyException("Can't resolve strategy for some of reason ($key, $args)", e)
