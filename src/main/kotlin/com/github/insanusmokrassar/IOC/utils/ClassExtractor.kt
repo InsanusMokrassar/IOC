@@ -28,7 +28,7 @@ fun <T> extract(path: String, vararg constructorArgs: Any): T {
 
         }
     }
-    throw IllegalArgumentException("Can't find constructor for this args");
+    throw IllegalArgumentException("Can't create instance of $path with args $constructorArgs")
 }
 
 fun <T> getClass(path: String): Class<T> {
