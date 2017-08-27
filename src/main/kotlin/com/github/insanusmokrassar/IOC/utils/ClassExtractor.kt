@@ -17,7 +17,7 @@ fun <T> extract(path: String, vararg constructorArgs: Any): T {
     constructors.forEach {
         if (it.parameterTypes.size == constructorArgs.size) {
             try {
-                return it.newInstance(constructorArgs) as T
+                return it.newInstance(*constructorArgs) as T
             } catch (e: InstantiationException) {
                 throw IllegalArgumentException("Can't instantiate the instance of class: it may be interface or abstract class", e);
             } catch (e: IllegalAccessException) {
