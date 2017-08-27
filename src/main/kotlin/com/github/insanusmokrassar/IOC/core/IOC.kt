@@ -39,23 +39,25 @@ fun loadConfig(config: IObject<Any>) {
         val ioc = getOrCreateIOC(it)
         val strategiesList = config.get<List<IObject<Any>>>(it)
         strategiesList.forEach {
-            val args = if (it.keys().contains(configKey)) {
-                try {
-                    it.get<List<Any>>(configKey).toTypedArray()
-                } catch (e: ReadException) {
-                    arrayOf(it.get<Any>(configKey))
-                }
-            } else {
-                arrayOf()
-            }
+            val config = getConfig(it)
             ioc.register(
                     it.get(nameKey),
                     extract(
                             it.get(packageKey),
-                            *args
+                            *config
                     )
             )
         }
+    }
+}
+
+fun getConfig(from: IObject<Any>) : Array<Any> {
+    return try {
+        from.get<List<Any>>(configKey).toTypedArray()
+    } catch (e: ClassCastException) {
+        arrayOf(from.get(configKey))
+    } catch (e: ReadException) {
+        emptyArray()
     }
 }
 
