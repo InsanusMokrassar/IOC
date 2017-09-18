@@ -71,7 +71,7 @@ class IOC internal constructor(){
     }
 
     @Throws(ResolveStrategyException::class)
-    fun <T: Any> resolve(key: String, vararg args: Any): T {
+    fun <T: Any> resolve(key: String, vararg args: Any?): T {
         return try {
             try {
                 strategies[key]!!.getInstance(*args)

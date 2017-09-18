@@ -15,3 +15,7 @@ Broken
 ### 1.1-3
 
 Patch for change logic of extracting objects
+
+## 1.2
+
+Make possible to use nullable values for resolving dependencies

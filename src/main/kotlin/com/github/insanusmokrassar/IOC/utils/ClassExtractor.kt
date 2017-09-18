@@ -8,10 +8,9 @@ import java.util.logging.Logger
  * @param path Path to package as path.to.package.java
  * @param <T> Target class (or interface)
  * @return New instance of target class
- * @throws ClassExtractException
  */
 @Throws(ClassNotFoundException::class, IllegalArgumentException::class)
-fun <T> extract(path: String, vararg constructorArgs: Any): T {
+fun <T> extract(path: String, vararg constructorArgs: Any?): T {
     val targetClass = getClass<T>(path)
     val constructors = targetClass.constructors
     constructors.forEach {
