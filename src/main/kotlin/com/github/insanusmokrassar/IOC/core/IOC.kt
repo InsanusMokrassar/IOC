@@ -4,7 +4,6 @@ import com.github.insanusmokrassar.IOC.utils.extract
 import com.github.insanusmokrassar.IObjectK.exceptions.ReadException
 import com.github.insanusmokrassar.IObjectK.interfaces.IObject
 
-val strategiesKey = "strategies"
 val nameKey = "name"
 val packageKey = "package"
 val configKey = "config"
@@ -39,12 +38,11 @@ fun loadConfig(config: IObject<Any>) {
         val ioc = getOrCreateIOC(it)
         val strategiesList = config.get<List<IObject<Any>>>(it)
         strategiesList.forEach {
-            val config = getConfig(it)
             ioc.register(
                     it.get(nameKey),
                     extract(
                             it.get(packageKey),
-                            *config
+                            *getConfig(it)
                     )
             )
         }
